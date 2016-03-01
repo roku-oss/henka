@@ -1,3 +1,4 @@
 .gradle
 .idea
 terraform-gradle-plugin.iml
+/build
