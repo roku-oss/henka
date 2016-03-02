@@ -3,6 +3,9 @@ stages:
   - test
   - publish
 
+before_script:
+  - chmod +x gradlew
+
 build:
   stage: build
   tags:
