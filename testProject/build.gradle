@@ -7,8 +7,6 @@ buildscript {
     }
 }
 
-//apply plugin: 'com.roku.gradle.terraform'
-
 task terraform(type: com.roku.terraform.TerraformTask) {
     description "Runs a terraform script"
     tfDir = "$projectDir/terraform"

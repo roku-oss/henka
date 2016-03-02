@@ -1,0 +1,37 @@
+stages:
+  - build
+  - test
+  - publish
+
+build:
+  stage: build
+  tags:
+    - java
+    - gradle
+  script:
+    - ./gradlew clean build
+
+unit-test:
+  stage: test
+  tags:
+    - java
+    - gradle
+  script:
+    - ./gradlew test
+
+integration:
+  stage: test
+  tags:
+    - java
+    - gradle
+    - terraform
+  script:
+    - ./gradlew publishToMavenLocal terraform
+
+publish:
+  stage: publish
+  tags:
+    - java
+    - gradle
+  script:
+    - gradle generatePomFileForMavenJavaPublication publish
