@@ -12,7 +12,10 @@ build:
     - java
     - gradle
   script:
-    - ./gradlew clean build
+    - cd plugin
+    - ./gradlew build publishToMavenLocal
+    - cd ..
+    - ./gradlew build
 
 unit-test:
   stage: test
@@ -29,7 +32,7 @@ integration:
     - gradle
     - terraform
   script:
-    - ./gradlew publishToMavenLocal terraform
+    - ./gradlew terraform
 
 publish:
   stage: publish
