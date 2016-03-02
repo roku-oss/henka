@@ -13,7 +13,7 @@ build:
     - gradle
   script:
     - cd plugin
-    - ./gradlew build publishToMavenLocal
+    - ../gradlew build publishToMavenLocal
     - cd ..
     - ./gradlew build
 
