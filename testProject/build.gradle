@@ -3,7 +3,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath "com.roku.gradle:terraform:0.9.1-SNAPSHOT"
+        classpath "com.roku.gradle:terraform"
     }
 }
 

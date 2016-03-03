@@ -12,6 +12,9 @@ build:
     - java
     - gradle
   script:
+    - cd plugin
+    - ../gradlew build publishToMavenLocal
+    - cd ..
     - ./gradlew build
 
 unit-test:
