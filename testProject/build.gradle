@@ -7,7 +7,7 @@ buildscript {
     }
 }
 
-task terraform(type: com.roku.terraform.TerraformTask) {
+task terraform(type: com.roku.terraform.TerraformTask, dependsOn: ":plugin:publishToMavenLocal") {
     description "Runs a terraform script"
     tfDir = "$projectDir/terraform"
     tfVarFile = "$projectDir/sample_terraform_vars/qa.vars"

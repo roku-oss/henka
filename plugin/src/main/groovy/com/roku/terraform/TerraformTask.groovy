@@ -18,7 +18,7 @@ class TerraformTask extends DefaultTask {
 
         def command1 = ["bash", "-c", "terraform remote config " +
                 "-backend=s3 -backend-config=\"bucket=$tfConfS3Bucket\" " +
-                "-backend-config=\"key='$tfConfS3Key' " +
+                "-backend-config=\"key='$tfConfS3Key'\" " +
                 "-backend-config=\"region=us-east-1\"".toString()]
         executeCommand(command1)
 
