@@ -3,7 +3,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath "com.roku.gradle:terraform"
+        classpath "com.roku.gradle:terraform"+project(":plugin").version
     }
 }
 
