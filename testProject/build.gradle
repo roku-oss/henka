@@ -15,4 +15,6 @@ task terraform(type: com.roku.terraform.TerraformTask, dependsOn: ":plugin:publi
 
     tfConfS3Bucket = "test-terraform-state"
     tfConfS3Key = "terraform-plugin-test/qa.tfstate"
+    tfAwsAccessKey = System.getenv('AWS_ACCESS_KEY')
+    tfAwsSecretKey = System.getenv('AWS_SECRET_KEY')
 }
