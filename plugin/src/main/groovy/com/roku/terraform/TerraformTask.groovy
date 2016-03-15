@@ -40,9 +40,6 @@ class TerraformTask extends DefaultTask {
         pb.environment().put("AWS_ACCESS_KEY_ID", tfAwsAccessKey)
         pb.environment().put("AWS_SECRET_ACCESS_KEY ", tfAwsSecretKey)
 
-        pb.environment().put("TF_VAR_aws_access_key", tfAwsAccessKey)
-        pb.environment().put("TF_VAR_aws_secret_key", tfAwsSecretKey)
-
         def process = pb
                 .directory(new File(tfDir))
                 .redirectErrorStream(true)
