@@ -7,6 +7,6 @@ class TerraformPlugin implements Plugin<Project>{
 
     @Override
     void apply(Project target) {
-        target.task('terraform', type: TerraformTask, description: 'Execute terraform scripts. Requires terraform to be installed and available on the path')
+        target.task('terraform', type: TerraformTask)
     }
 }
