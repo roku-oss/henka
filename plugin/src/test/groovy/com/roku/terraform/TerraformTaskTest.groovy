@@ -10,6 +10,7 @@ class TerraformTaskTest {
     @Test
     public void taskAddedToProject() {
         Project project = ProjectBuilder.builder().build()
+        project
         project.task('terraform', type: TerraformTask)
         assertTrue(
                 "Expect 'terraform' task to be an instance of TerraformTask, not ${project.tasks.terraform.class}".toString(),
