@@ -9,8 +9,11 @@ class TerraformTask extends DefaultTask {
     String tfVarFile
     String tfAction = "plan"
 
+    String tfConfS3Region = "us-east-1"
     String tfConfS3Bucket
     String tfConfS3Key
+    String tfAwsAccessKey
+    String tfAwsSecretKey
 
     @TaskAction
     def terraform() {
