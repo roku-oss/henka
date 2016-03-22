@@ -16,22 +16,28 @@ class TerraformTask extends DefaultTask {
     def terraform() {
         def tfVarFilePath = new File(tfVarFile).absolutePath
 
-        def command1 = ["bash", "-c", "terraform remote config " +
-                "-backend=s3 -backend-config=\"bucket=$tfConfS3Bucket\" " +
-                "-backend-config=\"key=$tfConfS3Key\" " +
-                "-backend-config=\"region=us-east-1\"".toString()]
+        def command1 = ['bash', '-c', "terraform remote config " +
+                "-backend=s3 " +
+                "-backend-config=bucket=$tfConfS3Bucket " +
+                "-backend-config=key=$tfConfS3Key " +
+                "-backend-config=region=$tfConfS3Region".toString()]
         executeCommand(command1)
 
-        def command2 = ["bash", "-c", "terraform $tfAction -var-file='${tfVarFilePath}' .".toString()]
+        def command2 = ['bash', '-c', "terraform $tfAction -var-file='${tfVarFilePath}' .".toString()]
         executeCommand(command2)
 
-        def command3 = ["bash", "-c", "terraform remote push".toString()]
+        def command3 = ['bash', '-c', "terraform remote push".toString()]
         executeCommand(command3)
     }
 
     private void executeCommand(ArrayList<String> command) {
         println command
-        def process = new ProcessBuilder(command)
+
+        def pb = new ProcessBuilder(command)
+        pb.environment().put("AWS_ACCESS_KEY_ID", tfAwsAccessKey)
+        pb.environment().put("AWS_SECRET_ACCESS_KEY", tfAwsSecretKey)
+
+        def process = pb
                 .directory(new File(tfDir))
                 .redirectErrorStream(true)
                 .start()
