@@ -32,7 +32,7 @@ integration:
     - gradle
     - terraform
   script:
-    - ./gradlew terraform -P conf_aws_access_key=$AWS_ACCESS_KEY -P conf_aws_secret_key=$AWS_SECRET_KEY
+    - ./gradlew terraform -P tfAwsAccessKey="$AWS_ACCESS_KEY" -P tfAwsSecretKey="$AWS_SECRET_KEY"
 
 publish:
   stage: publish

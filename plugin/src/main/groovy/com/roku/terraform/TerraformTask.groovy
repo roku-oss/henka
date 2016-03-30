@@ -17,20 +17,31 @@ class TerraformTask extends DefaultTask {
 
     @TaskAction
     def terraform() {
+        tfDir           = getPropertyFromTaskOrProject(tfDir,           "tfDir")
+        tfAction        = getPropertyFromTaskOrProject(tfAction,        "tfAction")
+        tfVarFile       = getPropertyFromTaskOrProject(tfVarFile,       "tfVarFile")
+        tfConfS3Key     = getPropertyFromTaskOrProject(tfConfS3Key,     "tfConfS3Key")
+        tfConfS3Bucket  = getPropertyFromTaskOrProject(tfConfS3Bucket,  "tfConfS3Bucket")
+        tfAwsAccessKey  = getPropertyFromTaskOrProject(tfAwsAccessKey,  "tfAwsAccessKey")
+        tfAwsSecretKey  = getPropertyFromTaskOrProject(tfAwsSecretKey,  "tfAwsSecretKey")
+
         def tfVarFilePath = new File(tfVarFile).absolutePath
 
-        def command1 = ['bash', '-c', "terraform remote config " +
+        executeCommand(['rm', '-rf', '.terraform'])
+        executeCommand(['bash', '-c', "terraform remote config " +
                 "-backend=s3 " +
                 "-backend-config=bucket=$tfConfS3Bucket " +
                 "-backend-config=key=$tfConfS3Key " +
-                "-backend-config=region=$tfConfS3Region".toString()]
-        executeCommand(command1)
+                "-backend-config=region=$tfConfS3Region".toString()])
+        executeCommand(['bash', '-c', "terraform $tfAction -var-file='${tfVarFilePath}' .".toString()])
+        executeCommand(['bash', '-c', 'terraform remote push'])
+    }
 
-        def command2 = ['bash', '-c', "terraform $tfAction -var-file='${tfVarFilePath}' .".toString()]
-        executeCommand(command2)
-
-        def command3 = ['bash', '-c', "terraform remote push".toString()]
-        executeCommand(command3)
+    def getPropertyFromTaskOrProject(String taskProperty, String propertyName) {
+        if (taskProperty == null && !project.hasProperty(propertyName)) {
+            throw new GradleScriptException("$propertyName should be defined either as a task- or a project-level property ", null)
+        }
+        return taskProperty == null ? project.property(propertyName) : taskProperty
     }
 
     private void executeCommand(ArrayList<String> command) {
@@ -44,7 +55,17 @@ class TerraformTask extends DefaultTask {
                 .directory(new File(tfDir))
                 .redirectErrorStream(true)
                 .start()
-        process.text.eachLine { println it }
+
+        def reader = new BufferedReader(new InputStreamReader(process.inputStream));
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                println line;
+            }
+        } finally {
+            reader.close()
+        }
+        process.waitFor()
         if (process.exitValue() != 0) {
             throw new GradleScriptException("error while executing shell script, exit code: " + process.exitValue(), null)
         }
