@@ -1,7 +1,7 @@
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 
-version '0.9.3-SNAPSHOT'
+version '0.9.4-SNAPSHOT'
 project.ext.artifactoryHost = 'artifactory2.omega.corp.roku:8081'
 
 dependencies {
