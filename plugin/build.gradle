@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 
 version '0.9.3'
-project.ext.artifactoryHost = 'artifactory2.omega.corp.roku:8081'
+project.ext.artifactoryHost = 'artifactory.cs.roku.com:8081'
 
 dependencies {
     compile gradleApi()
