@@ -1,3 +1,8 @@
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute.module("com.roku.gradle:terraform") with project(":plugin")
+    }
+}
 buildscript {
     repositories {
         mavenLocal()
