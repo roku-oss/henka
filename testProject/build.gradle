@@ -1,6 +1,6 @@
 configurations.all {
     resolutionStrategy.dependencySubstitution {
-        substitute.module("com.roku.gradle:terraform") with project(":plugin")
+        substitute.module("com.roku.gradle:terraform") with project(":plugin"), changing: true
     }
 }
 buildscript {

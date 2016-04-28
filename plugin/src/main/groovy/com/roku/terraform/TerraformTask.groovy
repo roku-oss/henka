@@ -25,6 +25,7 @@ class TerraformTask extends DefaultTask {
         tfVarFile       = getPropertyFromTaskOrProject(tfVarFile,       "tfVarFile")
         tfConfS3Key     = getPropertyFromTaskOrProject(tfConfS3Key,     "tfConfS3Key")
         tfConfS3Bucket  = getPropertyFromTaskOrProject(tfConfS3Bucket,  "tfConfS3Bucket")
+        tfConfS3Region  = getPropertyFromTaskOrProject(tfConfS3Region,  "tfConfS3Region")
         tfAwsAccessKey  = getPropertyFromTaskOrProject(tfAwsAccessKey,  "tfAwsAccessKey")
         tfAwsSecretKey  = getPropertyFromTaskOrProject(tfAwsSecretKey,  "tfAwsSecretKey")
 
