@@ -5,9 +5,12 @@ import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
 
 class TerraformTask extends DefaultTask {
+    public static final String PLAN = "plan"
+    public static final String APPLY = "apply"
+
     String tfDir
     String tfVarFile
-    String tfAction = "plan"
+    String tfAction = PLAN
 
     String tfConfS3Region = "us-east-1"
     String tfConfS3Bucket
@@ -22,6 +25,7 @@ class TerraformTask extends DefaultTask {
         tfVarFile       = getPropertyFromTaskOrProject(tfVarFile,       "tfVarFile")
         tfConfS3Key     = getPropertyFromTaskOrProject(tfConfS3Key,     "tfConfS3Key")
         tfConfS3Bucket  = getPropertyFromTaskOrProject(tfConfS3Bucket,  "tfConfS3Bucket")
+        tfConfS3Region  = getPropertyFromTaskOrProject(tfConfS3Region,  "tfConfS3Region")
         tfAwsAccessKey  = getPropertyFromTaskOrProject(tfAwsAccessKey,  "tfAwsAccessKey")
         tfAwsSecretKey  = getPropertyFromTaskOrProject(tfAwsSecretKey,  "tfAwsSecretKey")
 
@@ -34,7 +38,9 @@ class TerraformTask extends DefaultTask {
                 "-backend-config=key=$tfConfS3Key " +
                 "-backend-config=region=$tfConfS3Region".toString()])
         executeCommand(['bash', '-c', "terraform $tfAction -var-file='${tfVarFilePath}' .".toString()])
-        executeCommand(['bash', '-c', 'terraform remote push'])
+        if (APPLY.equals(tfAction)) {
+            executeCommand(['bash', '-c', 'terraform remote push'])
+        }
     }
 
     def getPropertyFromTaskOrProject(String taskProperty, String propertyName) {
