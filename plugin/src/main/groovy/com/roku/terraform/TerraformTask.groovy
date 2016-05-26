@@ -6,11 +6,10 @@ import org.gradle.api.tasks.TaskAction
 
 class TerraformTask extends DefaultTask {
     public static final String PLAN = "plan"
-    public static final String APPLY = "apply"
 
     String tfDir
     String tfVarFile
-    String tfAction = PLAN
+    String tfAction
 
     String tfConfS3Region = "us-east-1"
     String tfConfS3Bucket
@@ -38,7 +37,7 @@ class TerraformTask extends DefaultTask {
                 "-backend-config=key=$tfConfS3Key " +
                 "-backend-config=region=$tfConfS3Region".toString()])
         executeCommand(['bash', '-c', "terraform $tfAction -var-file='${tfVarFilePath}' .".toString()])
-        if (APPLY.equals(tfAction)) {
+        if (! PLAN.equals(tfAction)) {
             executeCommand(['bash', '-c', 'terraform remote push'])
         }
     }
