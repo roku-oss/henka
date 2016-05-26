@@ -12,10 +12,7 @@ build:
     - java
     - gradle
   script:
-    - cd plugin
-    - ../gradlew build publishToMavenLocal
-    - cd ..
-    - ./gradlew build
+    ./gradlew build publishToMavenLocal
 
 unit-test:
   stage: test
@@ -32,7 +29,7 @@ integration:
     - gradle
     - terraform
   script:
-    - ./gradlew terraform -P tfAwsAccessKey="$AWS_ACCESS_KEY" -P tfAwsSecretKey="$AWS_SECRET_KEY"
+    - ./gradlew --refresh-dependencies terraform -P tfAwsAccessKey="$AWS_ACCESS_KEY" -P tfAwsSecretKey="$AWS_SECRET_KEY"
 
 publish:
   stage: publish
