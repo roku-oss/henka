@@ -1,14 +1,9 @@
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute.module("com.roku.gradle:terraform") with project(":plugin"), changing: true
-    }
-}
 buildscript {
-    repositories {
-        mavenLocal()
+    flatDir {
+        dirs '../plugin/build/libs'
     }
     dependencies {
-        classpath "com.roku.gradle:terraform:"+project(":plugin").version
+        classpath "com.roku.gradle:terraform"+project(":plugin").version
     }
 }
 
