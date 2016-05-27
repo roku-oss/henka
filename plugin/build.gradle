@@ -1,6 +1,7 @@
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 
+archivesBaseName = 'terraform'
 version '0.9.4'
 project.ext.artifactoryHost = 'artifactory.cs.roku.com:8081'
 

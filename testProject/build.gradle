@@ -1,9 +1,11 @@
 buildscript {
-    flatDir {
-        dirs '../plugin/build/libs'
+    repositories {
+        flatDir {
+            dirs "$projectDir/../plugin/build/libs"
+        }
     }
     dependencies {
-        classpath "com.roku.gradle:terraform"+project(":plugin").version
+        classpath "com.roku.gradle:terraform:"+project(":plugin").version
     }
 }
 
