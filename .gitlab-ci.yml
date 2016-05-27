@@ -12,7 +12,8 @@ build:
     - java
     - gradle
   script:
-    ./gradlew build publishToMavenLocal
+    cd plugin
+    ../gradlew build publishToMavenLocal
 
 unit-test:
   stage: test
