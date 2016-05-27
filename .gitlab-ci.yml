@@ -15,17 +15,6 @@ build:
     - cd plugin
     - ../gradlew build publishToMavenLocal
 
-unit-test:
-  stage: test
-  tags:
-    - java
-    - gradle
-  script:
-    - cd plugin
-    - ../gradlew test
-    -  cd ../testProject
-    - ../gradlew test
-
 integration:
   stage: test
   tags:
