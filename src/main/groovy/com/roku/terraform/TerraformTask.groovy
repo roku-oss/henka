@@ -6,6 +6,7 @@ import org.gradle.api.tasks.TaskAction
 
 class TerraformTask extends DefaultTask {
     public static final String PLAN = "plan"
+    public static final int PLAN_CHANGES_DETECTED = 2
 
     String tfDir
     String tfVarFile
@@ -14,19 +15,18 @@ class TerraformTask extends DefaultTask {
     String tfConfS3Region = "us-east-1"
     String tfConfS3Bucket
     String tfConfS3Key
-    String tfAwsAccessKey
-    String tfAwsSecretKey
+    String tfFailOnPlanChanges
 
     @TaskAction
+    //TODO: enforce terraform version
     def terraform() {
-        tfDir           = getPropertyFromTaskOrProject(tfDir,           "tfDir")
-        tfAction        = getPropertyFromTaskOrProject(tfAction,        "tfAction")
-        tfVarFile       = getPropertyFromTaskOrProject(tfVarFile,       "tfVarFile")
-        tfConfS3Key     = getPropertyFromTaskOrProject(tfConfS3Key,     "tfConfS3Key")
-        tfConfS3Bucket  = getPropertyFromTaskOrProject(tfConfS3Bucket,  "tfConfS3Bucket")
-        tfConfS3Region  = getPropertyFromTaskOrProject(tfConfS3Region,  "tfConfS3Region")
-        tfAwsAccessKey  = getPropertyFromTaskOrProject(tfAwsAccessKey,  "tfAwsAccessKey")
-        tfAwsSecretKey  = getPropertyFromTaskOrProject(tfAwsSecretKey,  "tfAwsSecretKey")
+        tfDir               = getPropertyFromTaskOrProject(tfDir,           "tfDir")
+        tfAction            = getPropertyFromTaskOrProject(tfAction,        "tfAction")
+        tfVarFile           = getPropertyFromTaskOrProject(tfVarFile,       "tfVarFile")
+        tfConfS3Key         = getPropertyFromTaskOrProject(tfConfS3Key,     "tfConfS3Key")
+        tfConfS3Bucket      = getPropertyFromTaskOrProject(tfConfS3Bucket,  "tfConfS3Bucket")
+        tfConfS3Region      = getPropertyFromTaskOrProject(tfConfS3Region,  "tfConfS3Region")
+        tfFailOnPlanChanges = new Boolean(getPropertyFromTaskOrProject(tfFailOnPlanChanges, "tfFailOnPlanChanges"))
 
         def tfVarFilePath = new File(tfVarFile).absolutePath
 
@@ -36,7 +36,12 @@ class TerraformTask extends DefaultTask {
                 "-backend-config=bucket=$tfConfS3Bucket " +
                 "-backend-config=key=$tfConfS3Key " +
                 "-backend-config=region=$tfConfS3Region".toString()])
-        executeCommand(['bash', '-c', "terraform $tfAction -var-file='${tfVarFilePath}' .".toString()])
+        def tfCmdArgs = " $tfAction -var-file='${tfVarFilePath}'".toString()
+        if (PLAN.equals(tfAction) && tfFailOnPlanChanges == true) {
+            tfCmdArgs = tfCmdArgs + " -detailed-exitcode"
+        }
+        def tfArgs = ['bash', '-c', "terraform " + tfCmdArgs + " ."]
+        executeCommand(tfArgs)
         if (! PLAN.equals(tfAction)) {
             executeCommand(['bash', '-c', 'terraform remote push'])
         }
@@ -53,8 +58,6 @@ class TerraformTask extends DefaultTask {
         println command
 
         def pb = new ProcessBuilder(command)
-        pb.environment().put("AWS_ACCESS_KEY_ID", tfAwsAccessKey)
-        pb.environment().put("AWS_SECRET_ACCESS_KEY", tfAwsSecretKey)
 
         def process = pb
                 .directory(new File(tfDir))
@@ -71,6 +74,12 @@ class TerraformTask extends DefaultTask {
             reader.close()
         }
         process.waitFor()
+        System.out.println("tfFailOnPlanChanges="+tfFailOnPlanChanges)
+        System.out.println("process.exitValue()="+process.exitValue())
+
+        if (tfFailOnPlanChanges && process.exitValue() == PLAN_CHANGES_DETECTED) {
+            throw new GradleScriptException("Plan changes detected, aborting!", null)
+        }
         if (process.exitValue() != 0) {
             throw new GradleScriptException("error while executing shell script, exit code: " + process.exitValue(), null)
         }
