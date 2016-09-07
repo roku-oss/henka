@@ -28,6 +28,7 @@ class TerraformTask extends DefaultTask {
         tfConfS3Key         = getPropertyFromTaskOrProject(tfConfS3Key,     "tfConfS3Key")
         tfConfS3Bucket      = getPropertyFromTaskOrProject(tfConfS3Bucket,  "tfConfS3Bucket")
         tfConfS3Region      = getPropertyFromTaskOrProject(tfConfS3Region,  "tfConfS3Region")
+        tfConfS3KmsKey      = getPropertyFromTaskOrProject(tfConfS3KmsKey,  "tfConfS3KmsKey")
         tfFailOnPlanChanges = new Boolean(getPropertyFromTaskOrProject(tfFailOnPlanChanges, "tfFailOnPlanChanges"))
 
         def tfVarFilePath = new File(tfVarFile).absolutePath
