@@ -1,5 +1,6 @@
 package com.roku.terraform
 
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
@@ -15,7 +16,8 @@ class TerraformTask extends DefaultTask {
     String tfConfS3Region = "us-east-1"
     String tfConfS3Bucket
     String tfConfS3Key
-    String tfFailOnPlanChanges
+    String tfConfS3KmsKey
+    String tfFailOnPlanChanges = "false"
 
     @TaskAction
     //TODO: enforce terraform version
@@ -30,21 +32,31 @@ class TerraformTask extends DefaultTask {
 
         def tfVarFilePath = new File(tfVarFile).absolutePath
 
-        executeCommand(['rm', '-rf', '.terraform'])
-        executeCommand(['bash', '-c', "terraform remote config " +
-                "-backend=s3 " +
-                "-backend-config=bucket=$tfConfS3Bucket " +
-                "-backend-config=key=$tfConfS3Key " +
-                "-backend-config=region=$tfConfS3Region".toString()])
-        def tfCmdArgs = " $tfAction -var-file='${tfVarFilePath}'".toString()
-        if (PLAN.equals(tfAction) && tfFailOnPlanChanges == true) {
-            tfCmdArgs = tfCmdArgs + " -detailed-exitcode"
-        }
-        def tfArgs = ['bash', '-c', "terraform " + tfCmdArgs + " ."]
+        initTerraformRemoteStorage(tfConfS3Bucket, tfConfS3Key, tfConfS3Region, tfConfS3KmsKey)
+
+        List<String> tfArgs = prepareTfCommandArguments(tfAction, tfVarFilePath, tfFailOnPlanChanges)
         executeCommand(tfArgs)
         if (! PLAN.equals(tfAction)) {
             executeCommand(['bash', '-c', 'terraform remote push'])
         }
+    }
+
+    private List<String> prepareTfCommandArguments(String tfAction, tfVarFilePath, String tfFailOnPlanChanges) {
+        def tfCmdArgs = " $tfAction -var-file='${tfVarFilePath}'".toString()
+        if (PLAN.equals(tfAction) && tfFailOnPlanChanges == true) {
+            tfCmdArgs = tfCmdArgs + " -detailed-exitcode"
+        }
+        return ['bash', '-c', "terraform " + tfCmdArgs + " ."]
+    }
+
+    private void initTerraformRemoteStorage(String tfConfS3Bucket, String tfConfS3Key, String tfConfS3Region, String tfConfS3KmsKey) {
+        executeCommand(['rm', '-rf', '.terraform'])
+        executeCommand(['bash', '-c', "terraform remote config " +
+                " -backend=s3" +
+                " -backend-config=bucket=$tfConfS3Bucket" +
+                " -backend-config=key=$tfConfS3Key" +
+                (StringUtils.isEmpty(tfConfS3KmsKey) ? "" : " -backend-config=kms_key_id="+tfConfS3KmsKey) +
+                " -backend-config=region=$tfConfS3Region".toString()])
     }
 
     def getPropertyFromTaskOrProject(String taskProperty, String propertyName) {
@@ -74,8 +86,6 @@ class TerraformTask extends DefaultTask {
             reader.close()
         }
         process.waitFor()
-        System.out.println("tfFailOnPlanChanges="+tfFailOnPlanChanges)
-        System.out.println("process.exitValue()="+process.exitValue())
 
         if (tfFailOnPlanChanges && process.exitValue() == PLAN_CHANGES_DETECTED) {
             throw new GradleScriptException("Plan changes detected, aborting!", null)
