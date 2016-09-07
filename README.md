@@ -1,4 +1,5 @@
-# Gradle Pluging for Terraform scripts
+# Gradle Plugin for Terraform scripts
 
-Requires terraform to be installed and available in PATH
-
+Requirements:
+* terraform has to be installed and available in PATH
+* AWS S3 access should be configured either through env variables, default profile credentials or IAM profile
