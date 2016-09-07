@@ -55,7 +55,7 @@ class TerraformTask extends DefaultTask {
                 " -backend=s3" +
                 " -backend-config=bucket=$tfConfS3Bucket" +
                 " -backend-config=key=$tfConfS3Key" +
-                (StringUtils.isEmpty(tfConfS3KmsKey) ? "" : " -backend-config=kms_key_id="+tfConfS3KmsKey) +
+                (StringUtils.isEmpty(tfConfS3KmsKey) ? "" : " -backend-config=kms_key_id=$tfConfS3KmsKey") +
                 " -backend-config=region=$tfConfS3Region".toString()])
     }
 
