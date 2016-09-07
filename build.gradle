@@ -7,6 +7,7 @@ project.ext.artifactoryHost = 'artifactory.cs.roku.com:8081'
 
 dependencies {
     compile gradleApi()
+    compile 'org.apache.commons:commons-lang3:3.4'
     compile localGroovy()
 }
 
