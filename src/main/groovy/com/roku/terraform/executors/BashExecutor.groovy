@@ -5,7 +5,7 @@ class BashExecutor {
     public int execute(String command, String tfDir) {
         println command
 
-        def pb = new ProcessBuilder(command)
+        def pb = new ProcessBuilder("bash", "-c", command)
 
         def process = pb
                 .directory(new File(tfDir))
