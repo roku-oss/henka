@@ -12,24 +12,8 @@ build:
     - java
     - gradle
   script:
-    ./gradlew build publishToMavenLocal
+    - ./gradlew build publishToMavenLocal
 
-unit-test:
-  stage: test
-  tags:
-    - java
-    - gradle
-  script:
-    - ./gradlew test
-
-integration:
-  stage: test
-  tags:
-    - java
-    - gradle
-    - terraform
-  script:
-    - ./gradlew --refresh-dependencies terraform -P tfAwsAccessKey="$AWS_ACCESS_KEY" -P tfAwsSecretKey="$AWS_SECRET_KEY"
 
 publish:
   stage: publish
@@ -37,6 +21,6 @@ publish:
     - java
     - gradle
   script:
-    - gradle generatePomFileForMavenJavaPublication publish
+    - ./gradlew generatePomFileForMavenJavaPublication publish
   only:
     - tags

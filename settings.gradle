@@ -1,2 +1,1 @@
-include 'plugin'
-include 'testProject'
+rootProject.name = 'terraform-gradle-plugin'

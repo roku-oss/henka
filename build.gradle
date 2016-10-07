@@ -1,0 +1,40 @@
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+version '1.0.0-SNAPSHOT'
+project.ext.artifactoryHost = 'artifactory.cs.roku.com:8081'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile localGroovy()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId 'com.roku.gradle'
+            artifactId 'terraform'
+            version "${project.version}"
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username "${System.env.ARTIFACTORY_USER}"
+                password "${System.env.ARTIFACTORY_PWD}"
+            }
+            if(project.version.endsWith('-SNAPSHOT')) {
+                url "http://${project.artifactoryHost}/artifactory/libs-snapshot-local"
+            } else {
+                url "http://${project.artifactoryHost}/artifactory/libs-release-local"
+            }
+        }
+    }
+}
