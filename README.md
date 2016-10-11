@@ -36,7 +36,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath "com.roku.gradle:terraform:0.9.6"
+        classpath "com.roku:gradle-terraform:0.9.6"
     }
 }
 
@@ -84,3 +84,7 @@ Alternatively, all or some of terraform task properties can be specified as proj
 gradle terraform -P tfAction="apply" -P tfVarFile="<path to file with TF vars>"
 
 ```
+
+## Licensing
+
+Gradle Terraform Plugin is available as open source under the terms of [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.txt) 
