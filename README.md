@@ -69,3 +69,7 @@ Alternatively, you can skip some of the parameters in task and define them as pr
 ```
 gradle terraform –P tfAction=“apply” –P tfVarFile=“qa.vars” -P rokuEnv=“qa”
 ```
+
+## Licensing
+
+Gradle Terraform Plugin is available as open source under the terms of [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.txt) 
