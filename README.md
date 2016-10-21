@@ -1,4 +1,4 @@
-# Terraform Gradle Plugin
+# Henka (Terraform Gradle Plugin)
 
 ## Why do I need it? 
 
@@ -40,7 +40,7 @@ buildscript {
     }
 }
 
-task terraform(type: com.roku.terraform.TerraformTask) {
+task terraform(type: com.roku.henka.TerraformTask) {
     description "Runs a terraform script"
     tfDir = "$projectDir/YOUR_TERRAFORM_DIR"
     tfVarFile = "$projectDir/YOUR_TERRAFORM_ENV_CFG.vars"
@@ -73,3 +73,10 @@ gradle terraform –P tfAction=“apply” –P tfVarFile=“qa.vars” -P rokuE
 ## Licensing
 
 Gradle Terraform Plugin is available as open source under the terms of [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.txt) 
+
+## Contributing
+
+When submitting a PR, please fill in and submit an appropriate Software Grant & Contributor License Agreement:
+* [Individual Contributor License Agreement](Roku ICLA.txt)
+* or [Software Grant and Corporate Contributor License Agreement](Roku CCLA.txt)
+ 
