@@ -26,7 +26,7 @@ If any parameters are missing
 
 ## How do I run it?
 
-To see usage example please check the sample project: [Link to be added]
+To see usage example please check the sample project: https://github.com/rokudev/henka-sample/
 
 `build.gradle` changes:
 
