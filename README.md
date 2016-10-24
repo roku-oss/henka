@@ -1,5 +1,3 @@
-# henka
-=======
 # Henka (Terraform Gradle Plugin)
 
 ## Why do I need it? 
