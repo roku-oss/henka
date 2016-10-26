@@ -26,7 +26,7 @@ If any parameters are missing
 
 ## How do I run it?
 
-To see usage example please check the sample project: [Link to be added]
+To see usage example please check the sample project: https://github.com/rokudev/henka-sample/
 
 `build.gradle` changes:
 
@@ -42,13 +42,19 @@ buildscript {
 
 task terraform(type: com.roku.henka.TerraformTask) {
     description "Runs a terraform script"
-    tfDir = "$projectDir/YOUR_TERRAFORM_DIR"
-    tfVarFile = "$projectDir/YOUR_TERRAFORM_ENV_CFG.vars"
-    tfAction = "plan" // use "plan" for getting the list of upcoming changes and "apply" for executing them
+    tfDir       = "<path to folder with your terraform scripts>"
+    tfVarFile   = "<path to file with terraform variables>"
+    tfAction    = "plan" // [ "plan" | "apply" | "refresh"]
 
-    tfConfS3Bucket = "YOUR_S3_BUCKET"
-    tfConfS3Key = "YOUR_S3_KEY"
-}   
+    tfConfS3Bucket  = "<S3 bucket to store TF state in>"
+    tfConfS3Key     = "<S3 key to store TF state in>"
+    tfConfS3Region  = "<S3 region>" // e.g., "us-east-1"
+    tfConfS3KmsKey  = "<KMS key ARN to encrypt remote stante>"
+
+    tfAwsAccessKey  = "$System.env.TF_AWS_ACCESS_KEY" // obtain AWS access key from system environment
+    tfAwsSecretKey  = "$System.env.TF_AWS_SECRET_KEY" // obtain AWS access key from system environment
+}
+
 
 ```
 
@@ -64,10 +70,18 @@ The list of available properties:
 |String     |tfConfS3KmsKey         |Terraform Remote State :: KMS Key ARN to encrypt the remote state   |
 |Boolean    |tfFailOnPlanChanges    |If true - rturn with exit code if there are any planned changes. Default - false  |
      
-Alternatively, you can skip some of the parameters in task and define them as project-level properties. E.g.:
+
+To execute the task, call
 
 ```
-gradle terraform –P tfAction=“apply” –P tfVarFile=“qa.vars” -P rokuEnv=“qa”
+gradle terraform
+```
+
+Alternatively, all or some of terraform task properties can be specified as project properties in terraform command line:
+
+```
+gradle terraform -P tfAction="apply" -P tfVarFile="<path to file with TF vars>"
+
 ```
 
 ## Licensing
@@ -79,4 +93,3 @@ Gradle Terraform Plugin is available as open source under the terms of [Apache 2
 When submitting a PR, please fill in and submit an appropriate Software Grant & Contributor License Agreement:
 * [Individual Contributor License Agreement](Roku ICLA.txt)
 * or [Software Grant and Corporate Contributor License Agreement](Roku CCLA.txt)
- 
