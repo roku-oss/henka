@@ -32,5 +32,10 @@ abstract class TerraformExecutor {
                 " -backend-config=\"region=$task.tfConfS3Region\"".toString()
     }
 
+    public static String terraformRemotePush() {
+        return "terraform remote push".toString()
+    }
+
+
     abstract def execute(TerraformTask task)
 }

@@ -19,8 +19,13 @@ apply plugin: 'maven'
 
 group = 'com.roku'
 archivesBaseName = 'henka'
-version = '0.9.7-SNAPSHOT'
+version = '0.9.7'
 project.ext.artifactoryHost = 'artifactory.cs.roku.com:8081'
+
+
+project.ext.'signing.keyId' = System.env['ORG_GRADLE_PROJECT_signing_keyId']
+project.ext.'signing.password' = System.env['ORG_GRADLE_PROJECT_signing_password']
+project.ext.'signing.secretKeyRingFile' = System.env['ORG_GRADLE_PROJECT_signing_secretKeyRingFile']
 
 repositories {
     mavenCentral()
@@ -123,3 +128,8 @@ task sourcesJar(type: Jar) {
 artifacts {
     archives groovydocJar, sourcesJar
 }
+
+groovydocJar.onlyIf {  System.env['RELEASE_BUILD'] != null }
+sourcesJar.onlyIf {  System.env['RELEASE_BUILD'] != null }
+signArchives.onlyIf {  System.env['RELEASE_BUILD'] != null }
+

@@ -12,7 +12,7 @@ build:
     - java
     - gradle
   script:
-    - ./gradlew build publishToMavenLocal
+    - ./gradlew build publishToMavenLocal -x signArchives
 
 
 publish:
@@ -21,6 +21,6 @@ publish:
     - java
     - gradle
   script:
-    - ./gradlew generatePomFileForMavenJavaPublication publish
+    - ./gradlew generatePomFileForMavenJavaPublication publish -x signArchives
   only:
     - tags
