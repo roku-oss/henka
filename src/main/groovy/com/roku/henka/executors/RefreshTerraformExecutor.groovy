@@ -38,7 +38,6 @@ class RefreshTerraformExecutor extends TerraformExecutor{
         int exitCode = executor.execute("terraform refresh -no-color -var-file='${task.tfVarFile}'".toString(), task.tfDir)
 
         throwOnFailure(exitCode)
-
     }
 
     private void throwOnFailure(int exitCode) {

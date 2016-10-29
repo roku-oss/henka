@@ -25,11 +25,17 @@ abstract class TerraformExecutor {
     public static String terraformRemoteConfigFor(TerraformTask task) {
         return "terraform remote config " +
                 " -backend=s3" +
-                " -backend-config=bucket=$task.tfConfS3Bucket" +
-                " -backend-config=key=$task.tfConfS3Key" +
-                " -backend-config=kms_key_id=$task.tfConfS3KmsKey" +
-                " -backend-config=region=$task.tfConfS3Region".toString()
+                " -backend-config=\"encrypt=true\"" +
+                " -backend-config=\"bucket=$task.tfConfS3Bucket\"" +
+                " -backend-config=\"key=$task.tfConfS3Key\"" +
+                " -backend-config=\"kms_key_id=$task.tfConfS3KmsKey\"" +
+                " -backend-config=\"region=$task.tfConfS3Region\"".toString()
     }
+
+    public static String terraformRemotePush() {
+        return "terraform remote push".toString()
+    }
+
 
     abstract def execute(TerraformTask task)
 }

@@ -23,6 +23,20 @@ import org.gradle.api.tasks.TaskAction
 
 import javax.inject.Inject
 
+/**
+ * Defines TerraforTask type. Properties (accepted on task or project level):
+ * <ul>
+ *     <li> tfDir </li>
+ *     <li> tfVarFile </li>
+ *     <li> tfAction </li>
+ *     <li> tfConfS3Region </li>
+ *     <li> tfConfS3Bucket </li>
+ *     <li> tfConfS3Key </li>
+ *     <li> tfConfS3KmsKey </li>
+ *     <li> tfFailOnPlanChanges </li>
+ *  </ul>
+ *
+ */
 class TerraformTask extends DefaultTask {
     private final BashExecutor executor;
 
@@ -46,6 +60,10 @@ class TerraformTask extends DefaultTask {
     }
 
     @TaskAction
+    /**
+     * Parses properties and calls an appropriate TerraformExecutor, which is responsible for executing the
+     * right Terraform command (plan, apply or refresh)
+     */
     def terraform() {
         populateProperties()
         TerraformExecutor tfExecutor = TerraformExecutorFactory.createFor(tfAction)
