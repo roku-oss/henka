@@ -33,10 +33,10 @@ To see usage example please check the sample project: https://github.com/rokudev
 ```
 buildscript {
     repositories {
-        mavenLocal()
+        mavenCentral()
     }
     dependencies {
-        classpath "com.roku:gradle-terraform:0.9.6"
+        classpath "com.roku:gradle-terraform:0.9.7"
     }
 }
 
@@ -91,5 +91,5 @@ Gradle Terraform Plugin is available as open source under the terms of [Apache 2
 ## Contributing
 
 When submitting a PR, please fill in and submit an appropriate Software Grant & Contributor License Agreement:
-* [Individual Contributor License Agreement](Roku ICLA.txt)
-* or [Software Grant and Corporate Contributor License Agreement](Roku CCLA.txt)
+* [Individual Contributor License Agreement](https://raw.githubusercontent.com/rokudev/henka-sample/master/Roku%20ICLA.txt)
+* or [Software Grant and Corporate Contributor License Agreement](https://raw.githubusercontent.com/rokudev/henka/master/Roku%20CCLA.txt)
