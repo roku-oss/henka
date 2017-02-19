@@ -1,0 +1,7 @@
+.gradle
+.idea
+terraform-gradle-plugin.iml
+/build
+*.iml
+/testProject/terraform/.terraform
+/plugin/build
