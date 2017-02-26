@@ -19,7 +19,7 @@ class TerraformInstaller {
         this.antBuilder = antBuilder
     }
 
-    void installTerraform(String baseDirectory, String version) {
+    static void installTerraform(String baseDirectory, String version) {
         OsType osType = OsType.getOsType()
 
         String finalDirPath = baseDirectory+"/"+version+"/"

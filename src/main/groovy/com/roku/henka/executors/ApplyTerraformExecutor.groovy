@@ -23,7 +23,8 @@ class ApplyTerraformExecutor extends TerraformExecutor{
 
     private final BashExecutor executor;
 
-    ApplyTerraformExecutor() {
+    ApplyTerraformExecutor(String terraformPath) {
+        super("$terraformPath")
         this.executor = new BashExecutor();
     }
 
@@ -35,7 +36,7 @@ class ApplyTerraformExecutor extends TerraformExecutor{
     def execute(TerraformTask task) {
         executor.execute(cleanTerraformConfig(), task.tfDir)
         executor.execute(terraformRemoteConfigFor(task), task.tfDir)
-        int exitCode = executor.execute("terraform apply -no-color -var-file='${task.tfVarFile}'".toString(), task.tfDir)
+        int exitCode = executor.execute("$terraformPath"+"terraform apply -no-color -var-file='${task.tfVarFile}'".toString(), task.tfDir)
 
         throwOnFailure(exitCode)
     }

@@ -22,7 +22,8 @@ import org.gradle.api.GradleScriptException
 class RefreshTerraformExecutor extends TerraformExecutor{
     private final BashExecutor executor;
 
-    RefreshTerraformExecutor() {
+    RefreshTerraformExecutor(String terraformPath) {
+        super("$terraformPath")
         this.executor = new BashExecutor();
     }
 
@@ -35,7 +36,7 @@ class RefreshTerraformExecutor extends TerraformExecutor{
         executor.execute(cleanTerraformConfig(), task.tfDir)
         executor.execute(terraformRemoteConfigFor(task), task.tfDir)
 
-        int exitCode = executor.execute("terraform refresh -no-color -var-file='${task.tfVarFile}'".toString(), task.tfDir)
+        int exitCode = executor.execute("$terraformPath"+"terraform refresh -no-color -var-file='${task.tfVarFile}'".toString(), task.tfDir)
 
         throwOnFailure(exitCode)
     }

@@ -50,6 +50,10 @@ class TerraformTask extends DefaultTask {
     String tfConfS3KmsKey
     Boolean tfFailOnPlanChanges = false
 
+    Boolean installTerraform = false
+    String terraformVersion = "0.8.5"
+    String terraformBaseDir = "/opt/terraform"
+
     @Inject
     TerraformTask() {
         executor = new BashExecutor();
@@ -65,8 +69,17 @@ class TerraformTask extends DefaultTask {
      * right Terraform command (plan, apply or refresh)
      */
     def terraform() {
+        if (installTerraform) {
+            new TerraformInstaller().installTerraform(terraformBaseDir, terraformVersion)
+        }
+
         populateProperties()
-        TerraformExecutor tfExecutor = TerraformExecutorFactory.createFor(tfAction)
+        TerraformExecutor tfExecutor
+        if (installTerraform) {
+            tfExecutor = TerraformExecutorFactory.createFor("$terraformBaseDir/$terraformVersion/", tfAction)
+        } else {
+            tfExecutor = TerraformExecutorFactory.createFor(tfAction)
+        }
         tfExecutor.execute(this)
     }
 
@@ -79,6 +92,9 @@ class TerraformTask extends DefaultTask {
         tfConfS3Region = getPropertyFromTaskOrProject(tfConfS3Region, "tfConfS3Region")
         tfConfS3KmsKey = getPropertyFromTaskOrProject(tfConfS3KmsKey, "tfConfS3KmsKey")
         tfFailOnPlanChanges = new Boolean(getPropertyFromTaskOrProject(tfFailOnPlanChanges, "tfFailOnPlanChanges"))
+        installTerraform = new Boolean(getPropertyFromTaskOrProject(installTerraform, "installTerraform"))
+        terraformVersion = getPropertyFromTaskOrProject(terraformVersion, "terraformVersion")
+        terraformBaseDir = getPropertyFromTaskOrProject(terraformBaseDir, "terraformBaseDir")
 
         tfVarFile = new File(tfVarFile).absolutePath
     }
