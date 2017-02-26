@@ -68,7 +68,7 @@ task terraform(type: com.roku.henka.TerraformTask) {
 The list of available properties:
 
 |Datatype   |PropertyName           |Description                                                                | Default |
-|---        |---                    |---                                                                        | |
+|---|---|---|---|
 |String     |tfDir                  |Directory with Terraform scripts                                           | | 
 |String     |tfAction               |Terraform action (plan|refresh|apply)                                      | |
 |String     |tfVarFile              |Path to file with environment-specific configuration                       | |
