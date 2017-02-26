@@ -34,7 +34,11 @@ repositories {
 dependencies {
     compile gradleApi()
     compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'commons-io:commons-io:2.5'
     compile localGroovy()
+
+    testCompile 'org.assertj:assertj-core:3.+'
+    testCompile "org.mockito:mockito-core:2.+"
 }
 
 signing {
@@ -47,11 +51,11 @@ uploadArchives {
       beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
       repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
+        authentication(userName: System.env['OSSRH_USERNAME'], password: System.env['OSSRH_PASSWORD'])
       }
 
       snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: ossrhUsername, password: ossrhPassword)
+          authentication(userName: System.env['OSSRH_USERNAME'], password: System.env['OSSRH_PASSWORD'])
       }
 
       pom.project {

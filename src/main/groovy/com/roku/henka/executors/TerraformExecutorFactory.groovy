@@ -12,20 +12,25 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and limitations under the License.
 */
-package com.roku.henka.executors;
+package com.roku.henka.executors
 
-import org.gradle.api.GradleScriptException;
+import org.gradle.api.GradleScriptException
 
-public class TerraformExecutorFactory {
+ class TerraformExecutorFactory {
 
-    public static TerraformExecutor createFor(String action) {
+     static TerraformExecutor createFor(String action) {
+         createFor("", action)
+     }
+
+
+     static TerraformExecutor createFor(String terraformPath, String action) {
         switch (action) {
             case "plan":
-                return new PlanTerraformExecutor()
+                return new PlanTerraformExecutor(terraformPath)
             case "apply":
-                return new ApplyTerraformExecutor()
+                return new ApplyTerraformExecutor(terraformPath)
             case "refresh":
-                return new RefreshTerraformExecutor()
+                return new RefreshTerraformExecutor(terraformPath)
             default:
                 throw new GradleScriptException("Unknown tfAction: "+action, null)
         }

@@ -18,12 +18,22 @@ import com.roku.henka.TerraformTask
 
 abstract class TerraformExecutor {
 
-    public static String cleanTerraformConfig() {
+    final GString terraformPath
+
+    TerraformExecutor() {
+        this("")
+    }
+
+    TerraformExecutor(GString terraformPath) {
+        this.terraformPath = terraformPath
+    }
+
+    String cleanTerraformConfig() {
         return "rm -rf .terraform"
     }
 
-    public static String terraformRemoteConfigFor(TerraformTask task) {
-        return "terraform remote config " +
+    String terraformRemoteConfigFor(TerraformTask task) {
+        return terraformPath + "terraform remote config " +
                 " -backend=s3" +
                 " -backend-config=\"encrypt=true\"" +
                 " -backend-config=\"bucket=$task.tfConfS3Bucket\"" +
@@ -32,10 +42,9 @@ abstract class TerraformExecutor {
                 " -backend-config=\"region=$task.tfConfS3Region\"".toString()
     }
 
-    public static String terraformRemotePush() {
-        return "terraform remote push".toString()
+    String terraformRemotePush() {
+        return terraformPath + "terraform remote push".toString()
     }
-
 
     abstract def execute(TerraformTask task)
 }

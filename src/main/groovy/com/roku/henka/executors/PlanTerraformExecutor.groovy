@@ -24,7 +24,8 @@ class PlanTerraformExecutor extends TerraformExecutor{
 
     private final BashExecutor executor;
 
-    PlanTerraformExecutor() {
+    PlanTerraformExecutor(String terraformPath) {
+        super("$terraformPath")
         this.executor = new BashExecutor();
     }
 
@@ -55,7 +56,7 @@ class PlanTerraformExecutor extends TerraformExecutor{
     }
 
     private GString createTfCommand(TerraformTask task) {
-        def tfCommand = "terraform plan -no-color -var-file='${task.tfVarFile}'"
+        def tfCommand = "$terraformPath"+"terraform plan -no-color -var-file='${task.tfVarFile}'"
         if (task.tfFailOnPlanChanges) {
             tfCommand = tfCommand + " -detailed-exitcode".toString()
         }
