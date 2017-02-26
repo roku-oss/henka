@@ -19,7 +19,7 @@ apply plugin: 'maven'
 
 group = 'com.roku'
 archivesBaseName = 'henka'
-version = '0.10.0-SNAPSHOT'
+version = '0.10.0'
 project.ext.artifactoryHost = 'artifactory.cs.roku.com:8081'
 
 
