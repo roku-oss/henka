@@ -10,7 +10,8 @@ The plugin provides an opinionated way of running terraform scripts:
 ## What do I need to run it?
 
 To run the plugin:
-* terraform has to be installed and available in PATH
+* If you want to use preinstalled Terraform - it has to be installed and available in PATH, otherwise you need to set
+`installTerraform`, `terraformVersion` and `terraformBaseDir` parameters
 * AWS S3 access should be configured either through env variables, default profile credentials or IAM profile
 * you need to have valid terraform scripts and environment-specific configuration files
 * you need to add the plugin to your `build.gradle` and configure TerraformTask (provided by the plugin)
@@ -18,11 +19,10 @@ To run the plugin:
 ## What does it do?
 
 The plugin will:
+* download and install Terraform if needed (supported for Windows, Mac OsX and Linux)
 * clean up any remaining terraform state
 * initialize remote state or pull from S3 if it already exists
 * call terraform with the parameters you provided.
-
-If any parameters are missing
 
 ## How do I run it?
 
@@ -53,6 +53,13 @@ task terraform(type: com.roku.henka.TerraformTask) {
 
     tfAwsAccessKey  = "$System.env.TF_AWS_ACCESS_KEY" // obtain AWS access key from system environment
     tfAwsSecretKey  = "$System.env.TF_AWS_SECRET_KEY" // obtain AWS access key from system environment
+    
+    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+      terraformBaseDir = "c:/opt/terraform"
+    } else {
+      terraformBaseDir = "/opt/terraform"
+    }
+    terraformVersion = "0.8.7"
 }
 
 
@@ -60,15 +67,18 @@ task terraform(type: com.roku.henka.TerraformTask) {
 
 The list of available properties:
 
-|Datatype   |PropertyName           |Description|
-|---        |---                    |---|
-|String     |tfDir                  |Directory with Terraform scripts |
-|String     |tfAction               |Terraform action (plan/refresh/apply)   |
-|String     |tfVarFile              |Path to file with environment-specific configuration   |
-|String     |tfConfS3Bucket         |Terraform Remote State :: S3 Bucket  |
-|String     |tfConfS3Key            |Terraform Remote State :: S3 Key   |
-|String     |tfConfS3KmsKey         |Terraform Remote State :: KMS Key ARN to encrypt the remote state   |
-|Boolean    |tfFailOnPlanChanges    |If true - rturn with exit code if there are any planned changes. Default - false  |
+|Datatype   |PropertyName           |Description                                                                | Default |
+|---        |---                    |---                                                                        | |
+|String     |tfDir                  |Directory with Terraform scripts                                           | | 
+|String     |tfAction               |Terraform action (plan|refresh|apply)                                      | |
+|String     |tfVarFile              |Path to file with environment-specific configuration                       | |
+|String     |tfConfS3Bucket         |Terraform Remote State :: S3 Bucket                                        | |
+|String     |tfConfS3Key            |Terraform Remote State :: S3 Key                                           | |
+|String     |tfConfS3KmsKey         |Terraform Remote State :: KMS Key ARN to encrypt the remote state          | |
+|Boolean    |tfFailOnPlanChanges    |If true - return with exit code of 2 if there are any planned changes.     | false |
+|Boolean    |installTerraform       |If true - install terraform (of terraformVersion) to terraformBaseDir      | false |
+|String     |terraformVersion       |Version of Terraform to install                                            | |
+|String     |terraformBaseDir       |Base directory to install Terraform to. A subdirectory will be created for each Terraform version | | 
      
 
 To execute the task, call
