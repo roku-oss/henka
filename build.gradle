@@ -12,6 +12,17 @@
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and limitations under the License.
 */
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.7.3"
+}
+
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
@@ -20,15 +31,9 @@ apply plugin: 'maven'
 group = 'com.roku'
 archivesBaseName = 'henka'
 version = '0.10.0'
-project.ext.artifactoryHost = 'artifactory.cs.roku.com:8081'
-
-
-project.ext.'signing.keyId' = System.env['ORG_GRADLE_PROJECT_signing_keyId']
-project.ext.'signing.password' = System.env['ORG_GRADLE_PROJECT_signing_password']
-project.ext.'signing.secretKeyRingFile' = System.env['ORG_GRADLE_PROJECT_signing_secretKeyRingFile']
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -41,79 +46,64 @@ dependencies {
     testCompile "org.mockito:mockito-core:2.+"
 }
 
-signing {
-    sign configurations.archives
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "mprotsenko"
+            name "Mykyta Protsenko"
+            email "mykyta@protsenko.com"
+        }
+    }
 }
 
+// Create the publication with the pom configuration:
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        HenkaPublication(MavenPublication) {
             from components.java
+            artifact sourcesJar
+            artifact groovydocJar
             groupId 'com.roku'
             artifactId 'henka'
             version "${project.version}"
-        }
-    }
-
-    repositories {
-        maven {
-            credentials {
-                username "${System.env.ARTIFACTORY_USER}"
-                password "${System.env.ARTIFACTORY_PWD}"
-            }
-            if(project.version.endsWith('-SNAPSHOT')) {
-                url "http://${project.artifactoryHost}/artifactory/libs-snapshot-local"
-            } else {
-                url "http://${project.artifactoryHost}/artifactory/libs-release-local"
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Opionated Gradle Plugin for Terraform and AWS')
+                root.appendNode('name', 'Henka')
+                root.appendNode('url', 'https://github.com/roku-oss/henka.git')
+                root.children().last() + pomConfig
             }
         }
     }
 }
 
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['HenkaPublication']
+    pkg {
+        repo = 'roku-oss'
+        name = 'henka'
+        userOrg = 'roku-oss'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/roku-oss/henka.git'
+        desc = 'Opionated Gradle Plugin for Terraform and AWS'
 
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: System.env['OSSRH_USERNAME'], password: System.env['OSSRH_PASSWORD'])
-      }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-          authentication(userName: System.env['OSSRH_USERNAME'], password: System.env['OSSRH_PASSWORD'])
-      }
-
-      pom.project {
-        name 'Henka'
-        packaging 'jar'
-        artifactId = 'henka'
-        description 'Opionated Gradle Plugin for Terraform and AWS'
-        url 'https://github.com/rokudev/henka/'
-
-        scm {
-          connection 'scm:git:git@github.com:rokudev/henka.git'
-          developerConnection 'scm:git:git@github.com:rokudev/henka.git'
-          url 'https://github.com/rokudev/henka/'
+        version{
+            name = "${project.version}"
+            vcsTag = "${project.version}"
+            gpg {
+                sign = true
+            }
         }
-
-        licenses {
-          license {
-            name 'The Apache License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-          }
-        }
-
-        developers {
-          developer {
-            id 'mprotsenko'
-            name 'Mykyta Protsenko'
-            email 'mprotsenko@roku.com'
-          }
-        }
-      }
     }
-  }
 }
 
 groovydoc {
@@ -132,8 +122,3 @@ task sourcesJar(type: Jar) {
 artifacts {
     archives groovydocJar, sourcesJar
 }
-
-groovydocJar.onlyIf {  System.env['RELEASE_BUILD'] != null }
-sourcesJar.onlyIf {  System.env['RELEASE_BUILD'] != null }
-signArchives.onlyIf {  System.env['RELEASE_BUILD'] != null }
-
