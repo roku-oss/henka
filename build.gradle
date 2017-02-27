@@ -30,7 +30,7 @@ apply plugin: 'maven'
 
 group = 'com.roku'
 archivesBaseName = 'henka'
-version = '0.10.0'
+version = '0.10.1-SNAPSHOT'
 
 repositories {
     jcenter()
