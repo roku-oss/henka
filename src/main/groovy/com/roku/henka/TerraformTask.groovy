@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2016, Henka Contributors
+* Copyright (c) 2016-2017, Henka Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with
@@ -16,7 +16,6 @@ package com.roku.henka
 
 import com.roku.henka.executors.BashExecutor
 import com.roku.henka.executors.TerraformExecutor
-import com.roku.henka.executors.TerraformExecutorFactory
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
@@ -27,13 +26,10 @@ import javax.inject.Inject
  * Defines TerraforTask type. Properties (accepted on task or project level):
  * <ul>
  *     <li> tfDir </li>
- *     <li> tfVarFile </li>
  *     <li> tfAction </li>
- *     <li> tfConfS3Region </li>
- *     <li> tfConfS3Bucket </li>
- *     <li> tfConfS3Key </li>
- *     <li> tfConfS3KmsKey </li>
- *     <li> tfFailOnPlanChanges </li>
+ *     <li> installTerraform </li>
+ *     <li> terraformVersion </li>
+ *     <li> terraformBaseDir </li>
  *  </ul>
  *
  */
@@ -41,17 +37,11 @@ class TerraformTask extends DefaultTask {
     private final BashExecutor executor;
 
     String tfDir
-    String tfVarFile
     String tfAction
-
-    String tfConfS3Region = "us-east-1"
-    String tfConfS3Bucket
-    String tfConfS3Key
-    String tfConfS3KmsKey
-    Boolean tfFailOnPlanChanges = false
+    String tfInitParams = ""
 
     Boolean installTerraform = false
-    String terraformVersion = "0.8.5"
+    String terraformVersion = "0.9.2"
     String terraformBaseDir = "/opt/terraform"
 
     @Inject
@@ -63,11 +53,11 @@ class TerraformTask extends DefaultTask {
         this.executor = executor
     }
 
-    @TaskAction
     /**
      * Parses properties and calls an appropriate TerraformExecutor, which is responsible for executing the
-     * right Terraform command (plan, apply or refresh)
+     * right Terraform command (plan, apply etc.)
      */
+    @TaskAction
     def terraform() {
         if (installTerraform) {
             new TerraformInstaller().installTerraform(terraformBaseDir, terraformVersion)
@@ -76,27 +66,20 @@ class TerraformTask extends DefaultTask {
         populateProperties()
         TerraformExecutor tfExecutor
         if (installTerraform) {
-            tfExecutor = TerraformExecutorFactory.createFor("$terraformBaseDir/$terraformVersion/", tfAction)
+            tfExecutor = new TerraformExecutor("$terraformBaseDir/$terraformVersion/")
         } else {
-            tfExecutor = TerraformExecutorFactory.createFor(tfAction)
+            tfExecutor = new TerraformExecutor()
         }
-        tfExecutor.execute(this)
+        tfExecutor.execute(this, tfAction, tfInitParams)
     }
 
     private void populateProperties() {
         tfDir = getPropertyFromTaskOrProject(tfDir, "tfDir")
         tfAction = getPropertyFromTaskOrProject(tfAction, "tfAction")
-        tfVarFile = getPropertyFromTaskOrProject(tfVarFile, "tfVarFile")
-        tfConfS3Key = getPropertyFromTaskOrProject(tfConfS3Key, "tfConfS3Key")
-        tfConfS3Bucket = getPropertyFromTaskOrProject(tfConfS3Bucket, "tfConfS3Bucket")
-        tfConfS3Region = getPropertyFromTaskOrProject(tfConfS3Region, "tfConfS3Region")
-        tfConfS3KmsKey = getPropertyFromTaskOrProject(tfConfS3KmsKey, "tfConfS3KmsKey")
-        tfFailOnPlanChanges = new Boolean(getPropertyFromTaskOrProject(tfFailOnPlanChanges, "tfFailOnPlanChanges"))
+        tfInitParams = (getPropertyFromTaskOrProject(tfInitParams, "tfInitParams"))
         installTerraform = new Boolean(getPropertyFromTaskOrProject(installTerraform, "installTerraform"))
         terraformVersion = getPropertyFromTaskOrProject(terraformVersion, "terraformVersion")
         terraformBaseDir = getPropertyFromTaskOrProject(terraformBaseDir, "terraformBaseDir")
-
-        tfVarFile = new File(tfVarFile).absolutePath
     }
 
     String getPropertyFromTaskOrProject(Object taskProperty, String propertyName) {
