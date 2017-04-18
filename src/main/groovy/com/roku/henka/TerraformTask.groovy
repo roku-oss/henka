@@ -40,7 +40,7 @@ class TerraformTask extends DefaultTask {
     String tfAction
     String tfInitParams = ""
 
-    Boolean installTerraform = false
+    Boolean installTerraform = true
     String terraformVersion = "0.9.2"
     String terraformBaseDir = "/opt/terraform"
 
@@ -86,7 +86,7 @@ class TerraformTask extends DefaultTask {
         if (taskProperty == null && !project.hasProperty(propertyName)) {
             throw new GradleScriptException("$propertyName should be defined either as a task- or a project-level property ", null)
         }
-        return taskProperty == null ? project.property(propertyName) : taskProperty
+        return project.property(propertyName) == null ? taskProperty : project.property(propertyName)
     }
 
 }
