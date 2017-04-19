@@ -51,10 +51,10 @@ To see usage example please check the sample project: https://github.com/rokudev
 ```
 buildscript {
     repositories {
-        jcenter()
+        maven {url 'https://oss.jfrog.org/oss-snapshot-local/'}
     }
     dependencies {
-        classpath "com.roku:gradle-terraform:1.0.0"
+        classpath "com.roku:henka:1.0.0-SNAPSHOT"
     }
 }
 
