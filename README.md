@@ -33,6 +33,7 @@ To run the plugin:
 `installTerraform`, `terraformVersion` and `terraformBaseDir` parameters
 * you need to have valid terraform scripts and environment-specific configuration files
 * you need to add the plugin to your `build.gradle` and configure TerraformTask (provided by the plugin)
+* Terraform version should be 0.9.0 or higher
 
 ## What does it do?
 
@@ -50,10 +51,10 @@ To see usage example please check the sample project: https://github.com/rokudev
 ```
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
-        classpath "com.roku:gradle-terraform:1.0.0-SNAPSHOT"
+        classpath "com.roku:gradle-terraform:1.0.0"
     }
 }
 
@@ -62,7 +63,6 @@ task terraform(type: com.roku.henka.TerraformTask) {
     tfDir       = "<path to folder with your terraform scripts>"
     tfAction    = "plan -input=false" 
     tfInitParams = "-input=false -backend-config=bucket=roku-terraform-state-e1qa -backend-config=key=e1qa-henka-sample.tfstate -backend-config=kms_key_id=alias/e1qa-secrets -force-copy"
-
 
     terraformBaseDir = "/opt/terraform"
     terraformVersion = "0.9.2"
