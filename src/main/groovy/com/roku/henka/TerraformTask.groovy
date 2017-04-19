@@ -59,11 +59,11 @@ class TerraformTask extends DefaultTask {
      */
     @TaskAction
     def terraform() {
+        populateProperties()
         if (installTerraform) {
             new TerraformInstaller().installTerraform(terraformBaseDir, terraformVersion)
         }
 
-        populateProperties()
         TerraformExecutor tfExecutor
         if (installTerraform) {
             tfExecutor = new TerraformExecutor("$terraformBaseDir/$terraformVersion/")
@@ -86,7 +86,8 @@ class TerraformTask extends DefaultTask {
         if (taskProperty == null && !project.hasProperty(propertyName)) {
             throw new GradleScriptException("$propertyName should be defined either as a task- or a project-level property ", null)
         }
-        return project.property(propertyName) == null ? taskProperty : project.property(propertyName)
+
+        return ! project.hasProperty(propertyName) ? taskProperty : project.property(propertyName)
     }
 
 }
