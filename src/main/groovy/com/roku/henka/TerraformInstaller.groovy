@@ -41,6 +41,10 @@ class TerraformInstaller {
         FileUtils.copyURLToFile(new URL(distUrl), destZip)
 
         new AntBuilder().unzip(src: finalDistPath, dest: finalDirPath)
+        if (OsType.DARWIN_AMD64.equals(osType) || OsType.LINUX_AMD64.equals(osType)) {
+            "chmod u+x $baseDirectory/$version/terraform".execute()
+        }
+
     }
 
 }

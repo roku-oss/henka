@@ -23,10 +23,11 @@ import org.gradle.api.tasks.TaskAction
 import javax.inject.Inject
 
 /**
- * Defines TerraforTask type. Properties (accepted on task or project level):
+ * Defines TerraforTask type. Properties (accepted on task):
  * <ul>
  *     <li> tfDir </li>
  *     <li> tfAction </li>
+ *     <li> tfInitParams </li>
  *     <li> installTerraform </li>
  *     <li> terraformVersion </li>
  *     <li> terraformBaseDir </li>
@@ -59,7 +60,7 @@ class TerraformTask extends DefaultTask {
      */
     @TaskAction
     def terraform() {
-        populateProperties()
+        validateProperties()
         if (installTerraform) {
             new TerraformInstaller().installTerraform(terraformBaseDir, terraformVersion)
         }
@@ -73,21 +74,30 @@ class TerraformTask extends DefaultTask {
         tfExecutor.execute(this, tfAction, tfInitParams)
     }
 
-    private void populateProperties() {
-        tfDir = getPropertyFromTaskOrProject(tfDir, "tfDir")
-        tfAction = getPropertyFromTaskOrProject(tfAction, "tfAction")
-        tfInitParams = (getPropertyFromTaskOrProject(tfInitParams, "tfInitParams"))
-        installTerraform = new Boolean(getPropertyFromTaskOrProject(installTerraform, "installTerraform"))
-        terraformVersion = getPropertyFromTaskOrProject(terraformVersion, "terraformVersion")
-        terraformBaseDir = getPropertyFromTaskOrProject(terraformBaseDir, "terraformBaseDir")
-    }
-
-    String getPropertyFromTaskOrProject(Object taskProperty, String propertyName) {
-        if (taskProperty == null && !project.hasProperty(propertyName)) {
-            throw new GradleScriptException("$propertyName should be defined either as a task- or a project-level property ", null)
+    private void validateProperties() {
+        if (tfDir == null) {
+            throw new IllegalArgumentException("tfDir must be set")
         }
 
-        return ! project.hasProperty(propertyName) ? taskProperty : project.property(propertyName)
+        if (tfAction == null) {
+            throw new IllegalArgumentException("tfAction must be set")
+        }
+
+        if (tfInitParams == null) {
+            throw new IllegalArgumentException("tfInitParams must be set")
+        }
+
+        if (installTerraform == null) {
+            throw new IllegalArgumentException("installTerraform must be set")
+        }
+
+        if (installTerraform && terraformVersion == null) {
+            throw new IllegalArgumentException("terraform must be set when installing Terraform")
+        }
+
+        if (installTerraform && terraformBaseDir == null) {
+            throw new IllegalArgumentException("terraformBaseDir must be set when installing Terraform")
+        }
     }
 
 }
