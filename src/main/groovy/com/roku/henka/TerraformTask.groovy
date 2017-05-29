@@ -14,13 +14,9 @@
 */
 package com.roku.henka
 
-import com.roku.henka.executors.BashExecutor
 import com.roku.henka.executors.TerraformExecutor
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
-
-import javax.inject.Inject
 
 /**
  * Defines TerraforTask type. Properties (accepted on task):
@@ -34,8 +30,8 @@ import javax.inject.Inject
  *  </ul>
  *
  */
+@SuppressWarnings("GroovyUnusedDeclaration")
 class TerraformTask extends DefaultTask {
-    private final BashExecutor executor;
 
     String tfDir
     String tfAction
@@ -44,15 +40,6 @@ class TerraformTask extends DefaultTask {
     Boolean installTerraform = true
     String terraformVersion = "0.9.2"
     String terraformBaseDir = "/opt/terraform"
-
-    @Inject
-    TerraformTask() {
-        executor = new BashExecutor();
-    }
-
-    TerraformTask(BashExecutor executor) {
-        this.executor = executor
-    }
 
     /**
      * Parses properties and calls an appropriate TerraformExecutor, which is responsible for executing the
