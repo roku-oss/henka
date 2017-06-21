@@ -33,10 +33,10 @@ To see usage example please check the sample project: https://github.com/rokudev
 ```
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
     dependencies {
-        classpath "com.roku:gradle-terraform:0.9.7"
+        classpath "com.roku:gradle-terraform:0.10.0"
     }
 }
 
