@@ -1,27 +1,45 @@
 # Henka (Terraform Gradle Plugin)
 
+## What's new?
+
+This version of Henka (1.0.x) introduces a few backwards-incompatible changes to reflect a new backend mechanism
+in Terraform (https://www.terraform.io/docs/backends).
+
+Backwards-incompatible changes
+
+*   tfConfS3* variables are no longer supported. The backend is now configured as a part of Terraform scripts,
+    and is no longer limited to S3 (you can use Consul etc. as your backend).
+*   tfInitParams are required to complete a partial configuration of your backend. Please provide all missing pieces
+    of the configuration using "-backend-config" parameters.
+     
+    Example :`tfInitParams="-input=false -backend-config=bucket=roku-terraform-state-e1qa -backend-config=key=e1qa-henka-sample.tfstate -backend-config=kms_key_id=alias/e1qa-secrets -force-copy"`
+    
+    To see the list of configuration options for `terraform init` command and configuration syntax for backends, please see
+   
+    * https://www.terraform.io/docs/commands/init.html
+    * https://www.terraform.io/docs/backends
+
 ## Why do I need it? 
 
 The plugin provides an opinionated way of running terraform scripts:
-* it creates Terraform remote state in S3, so your state can be reused across your team
-* it enforces encryption of your remote state using KMS
-* in makes it easy to store multiple remote states for different environments, using different S3 buckets and keys
+* it makes sure the right version of Terraform is available, downloading it if necessary
+* it makes sures that your backend (a remote state) is initialized
+* in makes it easy to store multiple remote states for different environments
 
 ## What do I need to run it?
 
 To run the plugin:
 * If you want to use preinstalled Terraform - it has to be installed and available in PATH, otherwise you need to set
 `installTerraform`, `terraformVersion` and `terraformBaseDir` parameters
-* AWS S3 access should be configured either through env variables, default profile credentials or IAM profile
 * you need to have valid terraform scripts and environment-specific configuration files
 * you need to add the plugin to your `build.gradle` and configure TerraformTask (provided by the plugin)
+* Terraform version should be 0.9.0 or higher
 
 ## What does it do?
 
 The plugin will:
 * download and install Terraform if needed (supported for Windows, Mac OsX and Linux)
-* clean up any remaining terraform state
-* initialize remote state or pull from S3 if it already exists
+* initialize the backend Terraform state
 * call terraform with the parameters you provided.
 
 ## How do I run it?
@@ -33,33 +51,21 @@ To see usage example please check the sample project: https://github.com/rokudev
 ```
 buildscript {
     repositories {
-        jcenter()
+        maven {url 'https://oss.jfrog.org/oss-snapshot-local/'}
     }
     dependencies {
-        classpath "com.roku:gradle-terraform:0.10.0"
+        classpath "com.roku:henka:1.0.0-SNAPSHOT"
     }
 }
 
 task terraform(type: com.roku.henka.TerraformTask) {
     description "Runs a terraform script"
     tfDir       = "<path to folder with your terraform scripts>"
-    tfVarFile   = "<path to file with terraform variables>"
-    tfAction    = "plan" // [ "plan" | "apply" | "refresh"]
+    tfAction    = "plan -input=false" 
+    tfInitParams = "-input=false -backend-config=bucket=roku-terraform-state-e1qa -backend-config=key=e1qa-henka-sample.tfstate -backend-config=kms_key_id=alias/e1qa-secrets -force-copy"
 
-    tfConfS3Bucket  = "<S3 bucket to store TF state in>"
-    tfConfS3Key     = "<S3 key to store TF state in>"
-    tfConfS3Region  = "<S3 region>" // e.g., "us-east-1"
-    tfConfS3KmsKey  = "<KMS key ARN to encrypt remote stante>"
-
-    tfAwsAccessKey  = "$System.env.TF_AWS_ACCESS_KEY" // obtain AWS access key from system environment
-    tfAwsSecretKey  = "$System.env.TF_AWS_SECRET_KEY" // obtain AWS access key from system environment
-    
-    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
-      terraformBaseDir = "c:/opt/terraform"
-    } else {
-      terraformBaseDir = "/opt/terraform"
-    }
-    terraformVersion = "0.8.7"
+    terraformBaseDir = "/opt/terraform"
+    terraformVersion = "0.9.2"
 }
 
 
@@ -67,18 +73,13 @@ task terraform(type: com.roku.henka.TerraformTask) {
 
 The list of available properties:
 
-|Datatype   |PropertyName           |Description                                                                | Default |
+|Datatype   |PropertyName           |Description                                                                                        | Default |
 |---|---|---|---|
-|String     |tfDir                  |Directory with Terraform scripts                                           | | 
-|String     |tfAction               |Terraform action (plan|refresh|apply)                                      | |
-|String     |tfVarFile              |Path to file with environment-specific configuration                       | |
-|String     |tfConfS3Bucket         |Terraform Remote State :: S3 Bucket                                        | |
-|String     |tfConfS3Key            |Terraform Remote State :: S3 Key                                           | |
-|String     |tfConfS3KmsKey         |Terraform Remote State :: KMS Key ARN to encrypt the remote state          | |
-|Boolean    |tfFailOnPlanChanges    |If true - return with exit code of 2 if there are any planned changes.     | false |
-|Boolean    |installTerraform       |If true - install terraform (of terraformVersion) to terraformBaseDir      | false |
-|String     |terraformVersion       |Version of Terraform to install                                            | |
-|String     |terraformBaseDir       |Base directory to install Terraform to. A subdirectory will be created for each Terraform version | | 
+|String     |tfDir                  |Directory with Terraform scripts                                                                   | | 
+|String     |tfAction               |Terraform command, passed as-is, may include Terraform command as well as arguments                | |
+|Boolean    |installTerraform       |If true - install terraform (of `terraformVersion`) to `terraformBaseDir`                          | true |
+|String     |terraformVersion       |Version of Terraform to install                                                                    | 0.9.2 |
+|String     |terraformBaseDir       |Base directory to install Terraform to. A subdirectory will be created for each Terraform version  | /opt/terraform | 
      
 
 To execute the task, call
@@ -90,7 +91,7 @@ gradle terraform
 Alternatively, all or some of terraform task properties can be specified as project properties in terraform command line:
 
 ```
-gradle terraform -P tfAction="apply" -P tfVarFile="<path to file with TF vars>"
+gradle terraform -P tfAction="apply -input=false" 
 
 ```
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2016, Henka Contributors
+* Copyright (c) 2016-2017, Henka Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with
@@ -17,16 +17,19 @@ buildscript {
     repositories {
         jcenter()
     }
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:3.1.1"
+    }
 }
-
 plugins {
     id "com.jfrog.bintray" version "1.7.3"
 }
 
 apply plugin: 'groovy'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
 apply plugin: 'maven'
+apply plugin: 'maven-publish'
+//apply plugin: 'signing'
+apply plugin: 'com.jfrog.artifactory'
 
 group = 'com.roku'
 archivesBaseName = 'henka'
@@ -42,6 +45,7 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile localGroovy()
 
+    testCompile 'junit:junit:4.12'
     testCompile 'org.assertj:assertj-core:3.+'
     testCompile "org.mockito:mockito-core:2.+"
 }
@@ -98,10 +102,29 @@ bintray {
 
         version{
             name = "${project.version}"
-            vcsTag = "${project.version}"
             gpg {
                 sign = true
             }
+        }
+    }
+}
+
+
+artifactory {
+    contextUrl = 'https://oss.jfrog.org'
+    resolve {
+        repository {
+            repoKey = 'libs-release'
+        }
+    }
+    publish {
+        repository {
+            repoKey = 'oss-snapshot-local'
+            username = project.hasProperty('bintrayUser') ? project.bintrayUser : System.getenv('BINTRAY_USER')
+            password = project.hasProperty('bintrayKey') ? project.bintrayKey : System.getenv('BINTRAY_KEY')
+        }
+        defaults {
+            publications 'HenkaPublication'
         }
     }
 }

@@ -24,6 +24,7 @@ class BashExecutor {
         def process = pb
                 .directory(new File(tfDir))
                 .redirectErrorStream(true)
+                .redirectInput(ProcessBuilder.Redirect.INHERIT)
                 .start()
 
         def reader = new BufferedReader(new InputStreamReader(process.inputStream));

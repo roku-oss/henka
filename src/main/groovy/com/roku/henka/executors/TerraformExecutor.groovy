@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2016, Henka Contributors
+* Copyright (c) 2016-2017, Henka Contributors
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with
@@ -15,10 +15,12 @@
 package com.roku.henka.executors
 
 import com.roku.henka.TerraformTask
+import org.gradle.api.GradleScriptException
 
-abstract class TerraformExecutor {
+class TerraformExecutor {
 
     final GString terraformPath
+    private final BashExecutor executor;
 
     TerraformExecutor() {
         this("")
@@ -26,25 +28,29 @@ abstract class TerraformExecutor {
 
     TerraformExecutor(GString terraformPath) {
         this.terraformPath = terraformPath
+        executor = new BashExecutor()
     }
 
-    String cleanTerraformConfig() {
-        return "rm -rf .terraform"
+    TerraformExecutor(GString terraformPath, BashExecutor executor) {
+        this.terraformPath = terraformPath
+        this.executor = executor
     }
 
-    String terraformRemoteConfigFor(TerraformTask task) {
-        return terraformPath + "terraform remote config " +
-                " -backend=s3" +
-                " -backend-config=\"encrypt=true\"" +
-                " -backend-config=\"bucket=$task.tfConfS3Bucket\"" +
-                " -backend-config=\"key=$task.tfConfS3Key\"" +
-                " -backend-config=\"kms_key_id=$task.tfConfS3KmsKey\"" +
-                " -backend-config=\"region=$task.tfConfS3Region\"".toString()
+    String terraformInit(String tfInitParams) {
+        return terraformPath + "terraform init " + tfInitParams;
     }
 
-    String terraformRemotePush() {
-        return terraformPath + "terraform remote push".toString()
+
+    def execute(TerraformTask task, String tfAction, String tfInitParams) {
+        executor.execute(terraformInit(tfInitParams), task.tfDir)
+        int exitCode = executor.execute("$terraformPath"+"terraform ${tfAction}".toString(), task.tfDir)
+
+        throwOnFailure(exitCode)
     }
 
-    abstract def execute(TerraformTask task)
+    private void throwOnFailure(int exitCode) {
+        if (exitCode != 0) {
+            throw new GradleScriptException("error while executing shell script, exit code: " + exitCode, null)
+        }
+    }
 }
