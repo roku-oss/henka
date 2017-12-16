@@ -51,6 +51,7 @@ To see usage example please check the sample project: https://github.com/rokudev
 ```
 buildscript {
     repositories {
+        jcenter()
         maven {url 'https://oss.jfrog.org/oss-snapshot-local/'}
     }
     dependencies {
